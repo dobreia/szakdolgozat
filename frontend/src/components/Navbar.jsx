@@ -82,7 +82,7 @@ export default function Navbar() {
                             ) : (
                                 <>
                                     <li>
-                                        <div className="dropdown-item-text text-muted">
+                                        <div className="dropdown-item-text">
                                             {user.name} ({user.role})
                                         </div>
                                     </li>
