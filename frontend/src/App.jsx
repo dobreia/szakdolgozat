@@ -8,6 +8,7 @@ import ServicePage from './pages/admin/ServicePage'
 import UserPage from './pages/admin/UserPage'
 import EmployeesPage from './pages/admin/EmployeesPage'
 import BookingsPage from './pages/admin/BookingsPage'
+import LoginPage from './pages/LoginPage'
 
 function App() {
 
@@ -18,6 +19,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/booking" element={<BookingPage />} />
+          <Route path="/login" element={<LoginPage />} />
           {/* Admin oldalak */}
           <Route path="/admin/services" element={<ServicePage />} />
           <Route path="/admin/users" element={<UserPage />} />
