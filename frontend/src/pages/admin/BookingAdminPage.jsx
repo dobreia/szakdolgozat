@@ -5,36 +5,44 @@ export default function BookingAdminPage() {
     const [bookings, setBookings] = useState([]);
     const [error, setError] = useState("");
 
-    useEffect(() => {
-        const load = async () => {
-            try {
-                const res = await axios.get("/api/bookings");
-                console.log("Bookings response:", res.data);
-                setBookings(Array.isArray(res.data) ? res.data : []);
-            } catch (err) {
-                console.error(err);
-                setError("Nem sikerült betölteni a foglalásokat");
-            }
-        };
-        load();
-    }, []);
+    const fetchBookings = async () => {
+        try {
+            const res = await axios.get("/api/bookings");
+            setBookings(res.data);
+        } catch (err) {
+            setError("Nem sikerült betölteni a foglalásokat");
+        }
+    };
 
-    if (error) return <div className="alert alert-danger">{error}</div>;
-    if (!bookings.length) return <p>Jelenleg nincs foglalás.</p>;
+    const updateStatus = async (id, status) => {
+        try {
+            await axios.put(`/api/bookings/${id}/status`, { status });
+            await fetchBookings(); // frissítjük a listát
+        } catch (err) {
+            alert("Hiba a státusz módosításakor");
+        }
+    };
+
+    useEffect(() => {
+        fetchBookings();
+    }, []);
 
     return (
         <div className="container mt-4">
-            <h2>Foglalások listája</h2>
+            <h2>Foglalások kezelése</h2>
+            {error && <div className="alert alert-danger mt-3">{error}</div>}
+
             <table className="table table-striped mt-3">
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>Felhasználó</th>
                         <th>Szolgáltatás</th>
-                        <th>Munkatárs</th>
+                        <th>Dolgozó</th>
                         <th>Kezdés</th>
                         <th>Befejezés</th>
                         <th>Státusz</th>
+                        <th>Művelet</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -46,7 +54,37 @@ export default function BookingAdminPage() {
                             <td>{b.employee_name}</td>
                             <td>{new Date(b.start_time).toLocaleString()}</td>
                             <td>{new Date(b.end_time).toLocaleString()}</td>
-                            <td>{b.status}</td>
+                            <td>
+                                <span
+                                    className={
+                                        b.status === "confirmed"
+                                            ? "badge bg-success"
+                                            : b.status === "cancelled"
+                                                ? "badge bg-danger"
+                                                : "badge bg-warning text-dark"
+                                    }
+                                >
+                                    {b.status}
+                                </span>
+                            </td>
+                            <td>
+                                {b.status === "pending" && (
+                                    <>
+                                        <button
+                                            onClick={() => updateStatus(b.id, "confirmed")}
+                                            className="btn btn-success btn-sm me-2"
+                                        >
+                                            ✅ Jóváhagyás
+                                        </button>
+                                        <button
+                                            onClick={() => updateStatus(b.id, "cancelled")}
+                                            className="btn btn-danger btn-sm"
+                                        >
+                                            ❌ Elutasítás
+                                        </button>
+                                    </>
+                                )}
+                            </td>
                         </tr>
                     ))}
                 </tbody>

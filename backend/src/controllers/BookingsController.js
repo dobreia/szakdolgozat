@@ -3,15 +3,20 @@ import pool from "../db.js";
 export default class BookingsController {
     static async getAll() {
         const query = `
-    SELECT 
-      b.id, b.start_time, b.end_time, b.status,
-      u.name AS user_name,
-      s.name AS service_name
-    FROM bookings b
-    JOIN users u ON b.user_id = u.id
-    JOIN services s ON b.service_id = s.id
-    ORDER BY b.start_time DESC;
-  `;
+            SELECT 
+                b.id,
+                b.start_time,
+                b.end_time,
+                b.status,
+                u.name AS user_name,
+                s.name AS service_name,
+                e.name AS employee_name
+            FROM bookings b
+            JOIN users u ON b.user_id = u.id
+            JOIN services s ON b.service_id = s.id
+            JOIN employees e ON b.employee_id = e.id
+            ORDER BY b.start_time DESC;
+        `;
         const result = await pool.query(query);
         return result.rows;
     }
@@ -58,5 +63,18 @@ export default class BookingsController {
     static async delete(id) {
         await pool.query("DELETE FROM bookings WHERE id=$1", [id]);
         return { message: "Foglalás törölve" };
+    }
+
+    static async updateStatus(id, status) {
+        const validStatuses = ["pending", "confirmed", "cancelled"];
+        if (!validStatuses.includes(status)) {
+            throw new Error("Érvénytelen státusz");
+        }
+
+        const result = await pool.query(
+            `UPDATE bookings SET status = $1 WHERE id = $2 RETURNING *`,
+            [status, id]
+        );
+        return result.rows[0];
     }
 }

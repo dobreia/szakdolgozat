@@ -1,7 +1,7 @@
 import express from "express";
 import pool from "../db.js";
 import BookingsController from "../controllers/BookingsController.js";
-import { authRequired } from "../middleware/authMiddleware.js"
+import { authRequired, adminOnly } from "../middleware/authMiddleware.js"
 
 const router = express.Router();
 
@@ -99,6 +99,16 @@ router.delete("/:id", authRequired, async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: "Törlés sikertelen." });
+  }
+});
+
+router.put("/:id/status", authRequired, adminOnly, async (req, res) => {
+  try {
+    const { status } = req.body;
+    const updated = await BookingsController.updateStatus(req.params.id, status);
+    res.json(updated);
+  } catch (e) {
+    res.status(400).json({ error: e.message });
   }
 });
 
