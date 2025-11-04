@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import AdminHeader from "../../components/AdminHeader";
+
 import "../../styles/services.css";
 import "../../styles/global.css";
 
@@ -35,7 +37,7 @@ export default function EmployeesPage() {
 
   return (
     <div className="admin-container">
-      <h2>Dolgozók</h2>
+      <AdminHeader title="Dolgozók" />
 
       <form onSubmit={handleAddEmployee} className="service-form">
         <input

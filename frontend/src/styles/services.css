@@ -14,22 +14,13 @@
     color: var(--primary);
 }
 
-/* --- Címsor --- */
-.admin-container h2 {
-    font-family: "Varela Round", sans-serif;
-    font-weight: 600;
-    color: var(--primary);
-    border-bottom: 3px solid rgba(0, 39, 27, 0.2);
-    padding-bottom: 8px;
-    margin-bottom: 20px;
-    margin-top: 30px;
-}
+
 
 /* --- Új szolgáltatás űrlap --- */
 .service-form {
     background: var(--secondary);
     border-radius: 10px;
-    padding: 18px;
+    padding: 18px 0;
     display: flex;
     align-items: center;
     /* függőleges igazítás */

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import AdminHeader from "../../components/AdminHeader";
 
 export default function BookingAdminPage() {
     const [bookings, setBookings] = useState([]);
@@ -29,7 +30,7 @@ export default function BookingAdminPage() {
 
     return (
         <div className="container mt-4">
-            <h2>Foglalások kezelése</h2>
+            <AdminHeader title="Foglalások" />
             {error && <div className="alert alert-danger mt-3">{error}</div>}
 
             <table className="table table-striped mt-3">

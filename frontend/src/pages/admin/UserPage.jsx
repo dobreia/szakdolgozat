@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "../../styles/services.css";
-import "../../styles/global.css";
+import AdminHeader from "../../components/AdminHeader";
 
 export default function UsersPage() {
     const [users, setUsers] = useState([]);
@@ -8,11 +8,15 @@ export default function UsersPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const token = localStorage.getItem("token");
+    const authHeader = token ? { Authorization: "Bearer " + token } : {};
+
     const fetchUsers = async () => {
         try {
-            const res = await fetch("/api/users");
+            const res = await fetch("/api/users", { headers: { ...authHeader } });
+            if (!res.ok) throw new Error("Nem sikerült betölteni a felhasználókat.");
             const data = await res.json();
-            setUsers(data);
+            setUsers(Array.isArray(data) ? data : []);
         } catch (err) {
             setError("Nem sikerült betölteni a felhasználókat.");
         } finally {
@@ -29,7 +33,7 @@ export default function UsersPage() {
         try {
             const res = await fetch("/api/users", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json", ...authHeader },
                 body: JSON.stringify(newUser),
             });
             if (!res.ok) throw new Error("Hozzáadás sikertelen");
@@ -44,7 +48,7 @@ export default function UsersPage() {
         try {
             const res = await fetch(`/api/users/${id}`, {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json", ...authHeader },
                 body: JSON.stringify({ role }),
             });
             if (!res.ok) throw new Error("Módosítás sikertelen");
@@ -56,7 +60,10 @@ export default function UsersPage() {
 
     const handleDelete = async (id) => {
         if (!window.confirm("Biztosan törlöd a felhasználót?")) return;
-        await fetch(`/api/users/${id}`, { method: "DELETE" });
+        await fetch(`/api/users/${id}`, {
+            method: "DELETE",
+            headers: { ...authHeader },
+        });
         fetchUsers();
     };
 
@@ -65,8 +72,7 @@ export default function UsersPage() {
 
     return (
         <div className="admin-container">
-            <h2>Felhasználók</h2>
-
+            <AdminHeader title="Felhasználók" />
             <form onSubmit={handleAddUser} className="service-form mt-3 mb-4">
                 <input
                     type="text"
@@ -118,7 +124,10 @@ export default function UsersPage() {
                                 </select>
                             </td>
                             <td>
-                                <button className="btn btn-danger" onClick={() => handleDelete(u.id)}>
+                                <button
+                                    className="btn btn-danger"
+                                    onClick={() => handleDelete(u.id)}
+                                >
                                     Törlés
                                 </button>
                             </td>

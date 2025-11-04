@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import AdminHeader from "../../components/AdminHeader";
 import "../../styles/services.css";
 import "../../styles/global.css";
 
@@ -93,7 +94,7 @@ export default function ServicePage() {
 
     return (
         <div className="admin-container container-lg">
-            <h2>Szolgáltatások</h2>
+            <AdminHeader title="Szolgáltatások" />
 
             {/* Új szolgáltatás hozzáadása */}
             <form onSubmit={handleAddService} className="service-form mt-3 mb-4">

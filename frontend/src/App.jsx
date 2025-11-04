@@ -12,6 +12,7 @@ import LoginPage from './pages/LoginPage'
 import ServicePage from './pages/ServicePage'
 import MyBookingsPage from './pages/MyBookingsPage'
 import { useEffect } from 'react'
+import AdminDashboardPage from './pages/admin/AdminDashboardPage'
 
 function App() {
   const [user, setUser] = useState(null)
@@ -38,6 +39,7 @@ function App() {
           <Route path="/admin/users" element={<UserPage />} />
           <Route path="/admin/employees" element={<EmployeesPage />} />
           <Route path="/admin/bookings" element={<BookingAdminPage />} />
+          <Route path='/admin' element={<AdminDashboardPage />} />
         </Routes>
         <Footer />
       </BrowserRouter>
