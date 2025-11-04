@@ -10,6 +10,7 @@ import EmployeesPage from './pages/admin/EmployeesPage'
 import BookingAdminPage from './pages/admin/BookingAdminPage'
 import LoginPage from './pages/LoginPage'
 import ServicePage from './pages/ServicePage'
+import MyBookingsPage from './pages/MyBookingsPage'
 import { useEffect } from 'react'
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
           <Route path="/booking" element={<BookingPage />} />
           <Route path="/login" element={<LoginPage setUser={setUser} />} />
           <Route path="/services" element={<ServicePage />} />
+          <Route path="/my-bookings" element={<MyBookingsPage />} />
           {/* Admin oldalak */}
           <Route path="/admin/services" element={<ServiceAdminPage />} />
           <Route path="/admin/users" element={<UserPage />} />

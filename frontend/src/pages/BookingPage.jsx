@@ -5,8 +5,6 @@ export default function BookingPage() {
   const [services, setServices] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [form, setForm] = useState({
-    name: "",
-    email: "",
     service_id: "",
     employee_id: "",
     date: "",
@@ -31,9 +29,17 @@ export default function BookingPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("/api/bookings", form);
+      const user = JSON.parse(localStorage.getItem("user")); // bejelentkezett user
+
+      await axios.post("/api/bookings", {
+        user_id: user.id,
+        service_id: form.service_id,
+        employee_id: form.employee_id,
+        date: form.date, // pl. 2025-11-04T10:30
+      });
+
       setMessage("✅ Sikeres foglalás! Köszönjük.");
-      setForm({ name: "", email: "", service_id: "", employee_id: "", date: "" });
+      setForm({ service_id: "", employee_id: "", date: "" });
     } catch (err) {
       setMessage("❌ Hiba: " + (err.response?.data?.error || "Ismeretlen hiba"));
     }
@@ -43,27 +49,13 @@ export default function BookingPage() {
     <div className="container mt-5">
       <h2>Időpontfoglalás</h2>
       <form onSubmit={handleSubmit} className="booking-form mt-3">
-        <input
-          name="name"
-          placeholder="Név"
-          className="form-control mb-2"
-          value={form.name}
-          onChange={handleChange}
-        />
-        <input
-          name="email"
-          type="email"
-          placeholder="Email"
-          className="form-control mb-2"
-          value={form.email}
-          onChange={handleChange}
-        />
 
         <select
           name="service_id"
           className="form-select mb-2"
           value={form.service_id}
           onChange={handleChange}
+          required
         >
           <option value="">Válassz szolgáltatást</option>
           {services.map((s) => (
@@ -76,6 +68,7 @@ export default function BookingPage() {
           className="form-select mb-2"
           value={form.employee_id}
           onChange={handleChange}
+          required
         >
           <option value="">Válassz dolgozót</option>
           {employees.map((e) => (
@@ -89,6 +82,8 @@ export default function BookingPage() {
           className="form-control mb-3"
           value={form.date}
           onChange={handleChange}
+          required
+          min={new Date().toISOString().slice(0, 16)} // csak jövőbeli időpont
         />
 
         <button type="submit" className="btn btn-primary w-100">Foglalás küldése</button>

@@ -24,21 +24,21 @@ export default function Navbar({ user, setUser }) {
                 <div className="collapse navbar-collapse" id="mainNavbar">
                     <ul className="navbar-nav ms-3 mb-2 mb-lg-0">
                         <li className="nav-item">
-                            <Link to="/" className="nav-link">
-                                Főoldal
-                            </Link>
+                            <Link to="/" className="nav-link">Főoldal</Link>
                         </li>
                         <li className="nav-item">
-                            <Link to="/services" className="nav-link">
-                                Szolgáltatások
-                            </Link>
+                            <Link to="/services" className="nav-link">Szolgáltatások</Link>
                         </li>
                         <li className="nav-item">
-                            <Link to="/booking" className="nav-link">
-                                Időpontfoglalás
-                            </Link>
+                            <Link to="/booking" className="nav-link">Időpontfoglalás</Link>
                         </li>
+                        {user && (
+                            <li className="nav-item">
+                                <Link to="/my-bookings" className="nav-link">Saját foglalásaim</Link>
+                            </li>
+                        )}
                     </ul>
+
                 </div>
                 {/* Jobb oldal: profil + hamburger ikon egymás mellett */}
                 <div className="d-flex align-items-center gap-2">
@@ -52,6 +52,8 @@ export default function Navbar({ user, setUser }) {
                         >
                             <img src={profileIcon} alt="Profil" className="profile-icon" />
                         </button>
+
+
 
                         <ul className="dropdown-menu dropdown-menu-end dropdown-menu-dark">
                             {!user ? (

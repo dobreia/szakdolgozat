@@ -45,40 +45,60 @@ router.get("/my", authRequired, async (req, res) => {
   try {
     const result = await pool.query(
       `
-      SELECT b.*, s.name AS service_name, e.name AS employee_name
+      SELECT 
+        b.id,
+        b.start_time,
+        b.end_time,
+        b.status,
+        s.name AS service_name,
+        e.name AS employee_name
       FROM bookings b
       JOIN services s ON b.service_id = s.id
       JOIN employees e ON b.employee_id = e.id
       WHERE b.user_id = $1
-      ORDER BY b.date DESC
+      ORDER BY b.start_time DESC
       `,
       [req.user.id]
     );
+
     res.json(result.rows);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Nem sikerült lekérni a foglalásokat." });
   }
 });
+
 
 /**
  * 📌 3. Új foglalás létrehozása (bejelentkezett user)
  */
 router.post("/", async (req, res) => {
   try {
-    const { service_id, employee_id, date } = req.body;
-    const user_id = req.user?.id || null;
+    const { user_id, service_id, employee_id, date } = req.body;
 
-    const booking = await BookingsController.create({
-      user_id,
-      service_id,
-      employee_id,
-      start_time: date, // ← itt NE “date” nevű oszlopba menjen
-    });
+    // 1️⃣ Szolgáltatás időtartam lekérése
+    const serviceRes = await pool.query(
+      `SELECT duration_minutes FROM services WHERE id = $1`,
+      [service_id]
+    );
+    const duration = serviceRes.rows[0]?.duration_minutes || 30; // alap: 30 perc
 
-    res.status(201).json(booking);
+    // 2️⃣ Kezdés és befejezés kiszámítása
+    const start_time = new Date(date);
+    const end_time = new Date(start_time.getTime() + duration * 60000);
+
+    // 3️⃣ Foglalás mentése
+    const result = await pool.query(
+      `INSERT INTO bookings (user_id, service_id, employee_id, start_time, end_time, status)
+       VALUES ($1, $2, $3, $4, $5, 'pending')
+       RETURNING *`,
+      [user_id, service_id, employee_id, start_time, end_time]
+    );
+
+    res.status(201).json(result.rows[0]);
   } catch (e) {
-    console.error("Booking create error:", e);
-    res.status(500).json({ error: "Foglalás mentése sikertelen" });
+    console.error(e);
+    res.status(500).json({ error: "Foglalás mentése sikertelen." });
   }
 });
 
