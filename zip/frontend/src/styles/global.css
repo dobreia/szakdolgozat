@@ -1,0 +1,86 @@
+@import url("https://fonts.googleapis.com/css?family=Varela+Round&display=swap");
+@import url("https://fonts.googleapis.com/css?family=Montserrat&display=swap");
+@import url("https://fonts.googleapis.com/css?family=Nunito&display=swap");
+
+/* --- Alap reset --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* --- Színséma --- */
+:root {
+    --primary: #00271B;
+    /* mélyzöld főszín */
+    --secondary: #ffffff;
+    /* fehér */
+    --background: #f4f6f5;
+    /* oldal háttér */
+    --text: #1a1a1a;
+    /* általános szövegszín */
+    --accent: #0d6efd;
+    /* kék link/gomb szín */
+}
+
+/* --- Oldal háttér és szöveg --- */
+body {
+    background-color: var(--background);
+    color: var(--text);
+    font-family: "Nunito", sans-serif;
+    line-height: 1.6;
+}
+
+/* --- Címsorok --- */
+h1,
+h2,
+h3,
+h4,
+h5 {
+    font-family: "Varela Round", sans-serif;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.8rem;
+}
+
+h2 {
+    font-size: 1.8rem;
+    margin-bottom: 0.6rem;
+}
+
+h3 {
+    font-size: 1.4rem;
+    margin-bottom: 0.4rem;
+}
+
+/* --- Bekezdések --- */
+p {
+    font-family: "Nunito", sans-serif;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    color: var(--text);
+}
+
+/* --- Linkek --- */
+a {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+a:hover {
+    color: #014d32;
+    /* a primary sötétebb árnyalata */
+    text-decoration: underline;
+}
+
+
+/* --- Gombok alap kinézete (ha nem bootstrapet használsz) --- */
+button {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+}
