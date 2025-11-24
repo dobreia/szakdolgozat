@@ -23,12 +23,20 @@ export default class ServicesController {
   static async update(id, data) {
     const result = await pool.query(
       `UPDATE services
-         SET name=$1, duration_minutes=$2, price_cents=$3
-       WHERE id=$4 RETURNING *`,
-      [data.name, data.duration_minutes, data.price_cents, id]
+     SET name=$1, duration_minutes=$2, price_cents=$3, active=$4
+     WHERE id=$5
+     RETURNING *`,
+      [
+        data.name,
+        data.duration_minutes,
+        data.price_cents,
+        data.active,
+        id
+      ]
     );
     return result.rows[0];
   }
+
 
   // Szolgáltatás törlése (DELETE)
   static async delete(id) {

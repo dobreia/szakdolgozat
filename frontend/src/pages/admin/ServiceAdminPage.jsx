@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import AdminHeader from "../../components/AdminHeader";
-import "../../styles/services.css"; // 💚 csak custom styling
+import EditServiceModal from "../../components/EditServiceModal";
+import "../../styles/services.css";
 import "../../styles/global.css";
 
 export default function ServicePage() {
     const [services, setServices] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [errorStatus, setErrorStatus] = useState(null);
+    const [editingService, setEditingService] = useState(null);
 
     const [newService, setNewService] = useState({
         name: "",
@@ -16,7 +16,6 @@ export default function ServicePage() {
         price_cents: "",
     });
 
-    const navigate = useNavigate();
     const token = localStorage.getItem("token");
 
     const fetchServices = async () => {
@@ -25,24 +24,12 @@ export default function ServicePage() {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
-            if (res.status === 401) {
-                setErrorStatus(401);
-                setError("A szolgáltatások megtekintéséhez be kell jelentkezned.");
-                return;
-            }
-            if (res.status === 403) {
-                setErrorStatus(403);
-                setError("Nincs admin jogosultságod az oldal megtekintéséhez.");
-                return;
-            }
-
-            if (!res.ok) throw new Error();
+            if (!res.ok) throw new Error("Betöltési hiba");
 
             const data = await res.json();
             setServices(data);
-
         } catch (err) {
-            setError("Hiba történt az adatbetöltés során.");
+            setError("Hiba történt a szolgáltatások betöltése során.");
         } finally {
             setLoading(false);
         }
@@ -54,7 +41,6 @@ export default function ServicePage() {
 
     const handleAddService = async (e) => {
         e.preventDefault();
-
         try {
             const res = await fetch("/api/services", {
                 method: "POST",
@@ -66,20 +52,20 @@ export default function ServicePage() {
                     name: newService.name,
                     duration_minutes: parseInt(newService.duration_minutes),
                     price_cents: parseInt(newService.price_cents),
+                    active: true,
                 }),
             });
 
-            if (!res.ok) throw new Error();
+            if (!res.ok) throw new Error("Hozzáadás sikertelen");
 
-            fetchServices();
             setNewService({ name: "", duration_minutes: "", price_cents: "" });
-
+            fetchServices();
         } catch (err) {
-            setError("Hozzáadás sikertelen");
+            setError("A szolgáltatás hozzáadása sikertelen.");
         }
     };
 
-    const handleUpdate = async (id, updatedService) => {
+    const handleUpdate = async (id, updated) => {
         try {
             const res = await fetch(`/api/services/${id}`, {
                 method: "PUT",
@@ -87,19 +73,19 @@ export default function ServicePage() {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify(updatedService),
+                body: JSON.stringify(updated),
             });
 
-            if (!res.ok) throw new Error();
-            fetchServices();
+            if (!res.ok) throw new Error("Szerkesztés sikertelen");
 
+            fetchServices();
         } catch (err) {
-            alert("Szerkesztés sikertelen");
+            alert("A szolgáltatás módosítása nem sikerült!");
         }
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm("Biztosan törlöd ezt a szolgáltatást?")) return;
+        if (!window.confirm("Biztosan törlöd?")) return;
 
         try {
             const res = await fetch(`/api/services/${id}`, {
@@ -107,30 +93,22 @@ export default function ServicePage() {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
-            if (!res.ok) throw new Error();
-            fetchServices();
+            if (!res.ok) throw new Error("Törlés sikertelen");
 
+            fetchServices();
         } catch (err) {
-            alert("Törlés sikertelen");
+            alert("A törlés nem sikerült!");
         }
     };
 
     if (loading) return <p>Betöltés...</p>;
-
-    if (error) {
-        return (
-            <div className="admin-container container-lg text-center mt-4">
-                <AdminHeader title="Szolgáltatások" />
-                <p className="text-danger fw-bold mb-3">{error}</p>
-            </div>
-        );
-    }
+    if (error) return <p className="text-danger text-center">{error}</p>;
 
     return (
         <div className="admin-container container-lg">
             <AdminHeader title="Szolgáltatások" />
 
-            {/* Új elem hozzáadása */}
+            {/* Új szolgáltatás űrlap */}
             <form onSubmit={handleAddService} className="service-form mt-3 mb-4">
                 <div className="row g-2">
                     <div className="col-md-3">
@@ -139,6 +117,7 @@ export default function ServicePage() {
                             placeholder="Név"
                             value={newService.name}
                             onChange={(e) => setNewService({ ...newService, name: e.target.value })}
+                            required
                         />
                     </div>
 
@@ -147,9 +126,8 @@ export default function ServicePage() {
                             type="number"
                             placeholder="Időtartam (perc)"
                             value={newService.duration_minutes}
-                            onChange={(e) =>
-                                setNewService({ ...newService, duration_minutes: e.target.value })
-                            }
+                            onChange={(e) => setNewService({ ...newService, duration_minutes: e.target.value })}
+                            required
                         />
                     </div>
 
@@ -158,9 +136,8 @@ export default function ServicePage() {
                             type="number"
                             placeholder="Ár (Ft)"
                             value={newService.price_cents}
-                            onChange={(e) =>
-                                setNewService({ ...newService, price_cents: e.target.value })
-                            }
+                            onChange={(e) => setNewService({ ...newService, price_cents: e.target.value })}
+                            required
                         />
                     </div>
 
@@ -170,7 +147,7 @@ export default function ServicePage() {
                 </div>
             </form>
 
-
+            {/* Szolgáltatások táblázat */}
             <table className="service-table">
                 <thead>
                     <tr>
@@ -178,8 +155,8 @@ export default function ServicePage() {
                         <th>Név</th>
                         <th>Időtartam</th>
                         <th>Ár</th>
-                        <th>Aktív</th>
-                        <th>Műveletek</th>
+                        <th className="text-center">Aktív</th>
+                        <th className="text-center">Műveletek</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -187,32 +164,28 @@ export default function ServicePage() {
                         <tr key={s.id}>
                             <td>{s.id}</td>
                             <td>{s.name}</td>
-                            <td>{s.duration_minutes} perc</td>
-                            <td>{s.price_cents} Ft</td>
-
-                            <td>
+                            <td className="text-center">{s.duration_minutes} perc</td>
+                            <td className="text-right">{s.price_cents.toLocaleString()} Ft</td>
+                            <td className="text-center">
                                 <span className={`status-dot ${s.active ? "active" : "inactive"}`}></span>
                             </td>
-
-                            <td className="actions">
-                                <button
-                                    className="btn-edit"
-                                    onClick={() => navigate(`/admin/services/${s.id}/edit`)}
-                                >
-                                    Szerkesztés
-                                </button>
-
-                                <button
-                                    className="btn-delete"
-                                    onClick={() => handleDelete(s.id)}
-                                >
-                                    Törlés
-                                </button>
+                            <td className="actions-centered">
+                                <button className="btn-edit" onClick={() => setEditingService(s)}>Szerkesztés</button>
+                                <button className="btn-delete" onClick={() => handleDelete(s.id)}>Törlés</button>
                             </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
+
+            {/* Modal megjelenítése */}
+            {editingService && (
+                <EditServiceModal
+                    service={editingService}
+                    onClose={() => setEditingService(null)}
+                    onSave={handleUpdate}
+                />
+            )}
         </div>
     );
 }
