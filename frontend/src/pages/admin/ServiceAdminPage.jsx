@@ -1,13 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminHeader from "../../components/AdminHeader";
-import "../../styles/services.css";
+import "../../styles/services.css"; // 💚 csak custom styling
 import "../../styles/global.css";
 
-/**
- * Admin felület – Szolgáltatások kezelése
- * Csak admin jogosultsággal elérhető!
- */
 export default function ServicePage() {
     const [services, setServices] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -26,9 +22,7 @@ export default function ServicePage() {
     const fetchServices = async () => {
         try {
             const res = await fetch("/api/services", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
+                headers: { Authorization: `Bearer ${token}` },
             });
 
             if (res.status === 401) {
@@ -36,14 +30,13 @@ export default function ServicePage() {
                 setError("A szolgáltatások megtekintéséhez be kell jelentkezned.");
                 return;
             }
-
             if (res.status === 403) {
                 setErrorStatus(403);
                 setError("Nincs admin jogosultságod az oldal megtekintéséhez.");
                 return;
             }
 
-            if (!res.ok) throw new Error("Hiba történt a lekérdezés során.");
+            if (!res.ok) throw new Error();
 
             const data = await res.json();
             setServices(data);
@@ -59,7 +52,6 @@ export default function ServicePage() {
         fetchServices();
     }, []);
 
-    // Új szolgáltatás hozzáadása
     const handleAddService = async (e) => {
         e.preventDefault();
 
@@ -77,21 +69,16 @@ export default function ServicePage() {
                 }),
             });
 
-            if (res.status === 403) {
-                alert("Nincs admin jogosultságod a hozzáadáshoz!");
-                return;
-            }
-            if (!res.ok) throw new Error("Hozzáadás sikertelen.");
+            if (!res.ok) throw new Error();
 
-            await fetchServices();
+            fetchServices();
             setNewService({ name: "", duration_minutes: "", price_cents: "" });
 
         } catch (err) {
-            alert("Hiba: " + err.message);
+            setError("Hozzáadás sikertelen");
         }
     };
 
-    // Módosítás
     const handleUpdate = async (id, updatedService) => {
         try {
             const res = await fetch(`/api/services/${id}`, {
@@ -103,71 +90,38 @@ export default function ServicePage() {
                 body: JSON.stringify(updatedService),
             });
 
-            if (res.status === 403) {
-                alert("Nincs jogosultságod szolgáltatás szerkesztéséhez!");
-                return;
-            }
-            if (!res.ok) throw new Error("Szerkesztés sikertelen");
+            if (!res.ok) throw new Error();
+            fetchServices();
 
-            await fetchServices();
         } catch (err) {
-            alert("Hiba: " + err.message);
+            alert("Szerkesztés sikertelen");
         }
     };
 
-    // Törlés
     const handleDelete = async (id) => {
         if (!window.confirm("Biztosan törlöd ezt a szolgáltatást?")) return;
 
         try {
             const res = await fetch(`/api/services/${id}`, {
                 method: "DELETE",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
+                headers: { Authorization: `Bearer ${token}` },
             });
 
-            if (res.status === 403) {
-                alert("Nincs jogosultságod a törléshez!");
-                return;
-            }
-            if (!res.ok) throw new Error("Törlés sikertelen");
+            if (!res.ok) throw new Error();
+            fetchServices();
 
-            await fetchServices();
         } catch (err) {
-            alert("Hiba: " + err.message);
+            alert("Törlés sikertelen");
         }
     };
 
-    // Jogosultsági ellenőrzés megjelenítés
     if (loading) return <p>Betöltés...</p>;
 
     if (error) {
         return (
             <div className="admin-container container-lg text-center mt-4">
                 <AdminHeader title="Szolgáltatások" />
-
-                <p className="text-danger fw-bold mb-3">
-                    {error}
-                </p>
-
-                {errorStatus === 401 && (
-                    <button
-                        className="btn btn-primary"
-                        onClick={() => navigate("/login")}
-                    >
-                        Bejelentkezés
-                    </button>
-                )}
-
-                {errorStatus === 403 && (
-                    <button
-                        className="btn btn-secondary"
-                        onClick={() => navigate("/")}
-                    >
-                        Vissza a főoldalra
-                    </button>
-                )}
+                <p className="text-danger fw-bold mb-3">{error}</p>
             </div>
         );
     }
@@ -176,64 +130,54 @@ export default function ServicePage() {
         <div className="admin-container container-lg">
             <AdminHeader title="Szolgáltatások" />
 
-            {/* Új szolgáltatás hozzáadása */}
+            {/* Új elem hozzáadása */}
             <form onSubmit={handleAddService} className="service-form mt-3 mb-4">
                 <div className="row g-2">
                     <div className="col-md-3">
                         <input
                             type="text"
-                            className="form-control"
                             placeholder="Név"
                             value={newService.name}
-                            onChange={(e) =>
-                                setNewService({ ...newService, name: e.target.value })
-                            }
-                            required
+                            onChange={(e) => setNewService({ ...newService, name: e.target.value })}
                         />
                     </div>
+
                     <div className="col-md-3">
                         <input
                             type="number"
-                            className="form-control"
                             placeholder="Időtartam (perc)"
                             value={newService.duration_minutes}
                             onChange={(e) =>
-                                setNewService({
-                                    ...newService,
-                                    duration_minutes: e.target.value,
-                                })
+                                setNewService({ ...newService, duration_minutes: e.target.value })
                             }
-                            required
                         />
                     </div>
+
                     <div className="col-md-3">
                         <input
                             type="number"
-                            className="form-control"
                             placeholder="Ár (Ft)"
                             value={newService.price_cents}
                             onChange={(e) =>
                                 setNewService({ ...newService, price_cents: e.target.value })
                             }
-                            required
                         />
                     </div>
+
                     <div className="col-md-3">
-                        <button type="submit" className="btn btn-success w-100">
-                            Hozzáadás
-                        </button>
+                        <button type="submit" className="btn-success">Hozzáadás</button>
                     </div>
                 </div>
             </form>
 
-            {/* Szolgáltatások táblázat */}
-            <table className="table table-striped align-middle">
+
+            <table className="service-table">
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>Név</th>
-                        <th>Időtartam (perc)</th>
-                        <th>Ár (Ft)</th>
+                        <th>Időtartam</th>
+                        <th>Ár</th>
                         <th>Aktív</th>
                         <th>Műveletek</th>
                     </tr>
@@ -242,77 +186,24 @@ export default function ServicePage() {
                     {services.map((s) => (
                         <tr key={s.id}>
                             <td>{s.id}</td>
+                            <td>{s.name}</td>
+                            <td>{s.duration_minutes} perc</td>
+                            <td>{s.price_cents} Ft</td>
+
                             <td>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    style={{ width: "150px" }}
-                                    value={s.name}
-                                    onChange={(e) => {
-                                        const updated = { ...s, name: e.target.value };
-                                        setServices((prev) =>
-                                            prev.map((srv) =>
-                                                srv.id === s.id ? updated : srv
-                                            )
-                                        );
-                                        if (e.target.value.trim() !== "") {
-                                            handleUpdate(s.id, updated);
-                                        }
-                                    }}
-                                />
+                                <span className={`status-dot ${s.active ? "active" : "inactive"}`}></span>
                             </td>
-                            <td>
-                                <input
-                                    type="number"
-                                    className="form-control"
-                                    style={{ width: "100px" }}
-                                    value={s.duration_minutes ?? ""}
-                                    onChange={(e) => {
-                                        if (e.target.value === "") {
-                                            setServices((prev) =>
-                                                prev.map((srv) =>
-                                                    srv.id === s.id
-                                                        ? { ...srv, duration_minutes: "" }
-                                                        : srv
-                                                )
-                                            );
-                                            return;
-                                        }
-                                        handleUpdate(s.id, {
-                                            ...s,
-                                            duration_minutes: parseInt(e.target.value),
-                                        });
-                                    }}
-                                />
-                            </td>
-                            <td>
-                                <input
-                                    type="number"
-                                    className="form-control"
-                                    style={{ width: "110px" }}
-                                    value={s.price_cents ?? ""}
-                                    onChange={(e) => {
-                                        if (e.target.value === "") {
-                                            setServices((prev) =>
-                                                prev.map((srv) =>
-                                                    srv.id === s.id
-                                                        ? { ...srv, price_cents: "" }
-                                                        : srv
-                                                )
-                                            );
-                                            return;
-                                        }
-                                        handleUpdate(s.id, {
-                                            ...s,
-                                            price_cents: parseInt(e.target.value),
-                                        });
-                                    }}
-                                />
-                            </td>
-                            <td>{s.active ? "✅" : "❌"}</td>
-                            <td>
+
+                            <td className="actions">
                                 <button
-                                    className="btn btn-danger btn-sm"
+                                    className="btn-edit"
+                                    onClick={() => navigate(`/admin/services/${s.id}/edit`)}
+                                >
+                                    Szerkesztés
+                                </button>
+
+                                <button
+                                    className="btn-delete"
                                     onClick={() => handleDelete(s.id)}
                                 >
                                     Törlés
