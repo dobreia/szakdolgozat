@@ -1,55 +1,39 @@
 import express from "express";
 import EmployeesController from "../controllers/EmployeesController.js";
-import { authRequired, adminOnly } from "../middleware/authMiddleware.js"; // <== EZT ADD HOZZÁ
+import { authRequired, adminOnly } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-/**
- * ✅ GET all employees (public)
- * Nyilvános, hogy a foglalási oldalon is betölthesse a listát.
- */
-router.get("/", async (req, res) => {
+// Csak admin kérheti le az alkalmazottakat
+router.get("/", authRequired, adminOnly, async (req, res) => {
     try {
-        const employees = await EmployeesController.getAll();
-        res.json(employees);
-    } catch (e) {
-        res.status(500).json({ error: e.message });
+        res.json(await EmployeesController.getAll());
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
 });
 
-/**
- * 🔐 POST new employee (admin only)
- */
 router.post("/", authRequired, adminOnly, async (req, res) => {
     try {
-        const created = await EmployeesController.create(req.body);
-        res.status(201).json(created);
-    } catch (e) {
-        res.status(500).json({ error: e.message });
+        res.status(201).json(await EmployeesController.create(req.body));
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
 });
 
-/**
- * 🔐 PUT update employee (admin only)
- */
 router.put("/:id", authRequired, adminOnly, async (req, res) => {
     try {
-        const updated = await EmployeesController.update(req.params.id, req.body);
-        res.json(updated);
-    } catch (e) {
-        res.status(500).json({ error: e.message });
+        res.json(await EmployeesController.update(req.params.id, req.body));
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
 });
 
-/**
- * 🔐 DELETE employee (admin only)
- */
 router.delete("/:id", authRequired, adminOnly, async (req, res) => {
     try {
-        const deleted = await EmployeesController.delete(req.params.id);
-        res.json(deleted);
-    } catch (e) {
-        res.status(500).json({ error: e.message });
+        res.json(await EmployeesController.delete(req.params.id));
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
 });
 
