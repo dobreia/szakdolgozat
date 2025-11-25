@@ -1,48 +1,34 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import AdminHeader from "../../components/AdminHeader";
 
-import "../../styles/services.css";
+import "../../styles/employees.css";
 import "../../styles/global.css";
 
 export default function EmployeesPage() {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [errorStatus, setErrorStatus] = useState(null);
+  const [formError, setFormError] = useState(null);
 
-  const [newEmployee, setNewEmployee] = useState({ name: "", email: "" });
+  const [newEmployee, setNewEmployee] = useState({
+    name: "",
+    email: ""
+  });
 
-  const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
   const fetchEmployees = async () => {
     try {
       const res = await fetch("/api/employees", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (res.status === 401) {
-        setErrorStatus(401);
-        setError("A dolgozók megtekintéséhez be kell jelentkezned.");
-        return;
-      }
-
-      if (res.status === 403) {
-        setErrorStatus(403);
-        setError("Nincs admin jogosultságod az oldal megtekintéséhez.");
-        return;
-      }
-
-      if (!res.ok) throw new Error("Hiba történt az adatbetöltés során.");
+      if (!res.ok) throw new Error("Betöltési hiba");
 
       const data = await res.json();
       setEmployees(data);
-
     } catch (err) {
-      setError("Hiba történt az adatbetöltés során.");
+      setError("Hiba történt a dolgozók betöltése során.");
     } finally {
       setLoading(false);
     }
@@ -54,6 +40,7 @@ export default function EmployeesPage() {
 
   const handleAddEmployee = async (e) => {
     e.preventDefault();
+    setFormError(null);
 
     try {
       const res = await fetch("/api/employees", {
@@ -65,124 +52,99 @@ export default function EmployeesPage() {
         body: JSON.stringify(newEmployee),
       });
 
-      if (res.status === 403) {
-        alert("Nincs jogosultságod alkalmazottat hozzáadni!");
+      const data = await res.json();
+
+      if (!res.ok) {
+        setFormError(data.message || "Hozzáadás sikertelen");
         return;
       }
-      if (!res.ok) throw new Error("Hozzáadás sikertelen.");
 
-      await fetchEmployees();
       setNewEmployee({ name: "", email: "" });
-
-    } catch (err) {
-      alert("Hiba: " + err.message);
+      fetchEmployees();
+    } catch {
+      setFormError("Hálózati hiba történt!");
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Biztosan törlöd a dolgozót?")) return;
+    if (!window.confirm("Biztosan törlöd?")) return;
 
     try {
       const res = await fetch(`/api/employees/${id}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (res.status === 403) {
-        alert("Nincs jogosultságod törölni!");
-        return;
-      }
-      if (!res.ok) throw new Error("Törlés sikertelen.");
+      if (!res.ok) throw new Error("Törlés sikertelen");
 
-      await fetchEmployees();
-
-    } catch (err) {
-      alert("Hiba: " + err.message);
+      fetchEmployees();
+    } catch {
+      alert("A törlés nem sikerült!");
     }
   };
 
   if (loading) return <p>Betöltés...</p>;
-
-  if (error) {
-    return (
-      <div className="admin-container container-lg text-center mt-4">
-        <AdminHeader title="Dolgozók" />
-
-        <p className="text-danger fw-bold mb-3">{error}</p>
-
-        {errorStatus === 401 && (
-          <button
-            className="btn btn-primary"
-            onClick={() => navigate("/login")}
-          >
-            Bejelentkezés
-          </button>
-        )}
-
-        {errorStatus === 403 && (
-          <button
-            className="btn btn-secondary"
-            onClick={() => navigate("/")}
-          >
-            Vissza a főoldalra
-          </button>
-        )}
-      </div>
-    );
-  }
+  if (error) return <p className="text-danger text-center">{error}</p>;
 
   return (
-    <div className="admin-container">
+    <div className="admin-container container-lg">
       <AdminHeader title="Dolgozók" />
 
-      <form onSubmit={handleAddEmployee} className="service-form mt-3 mb-4 d-flex gap-2">
-        <input
-          type="text"
-          className="form-control"
-          placeholder="Név"
-          value={newEmployee.name}
-          onChange={(e) =>
-            setNewEmployee({ ...newEmployee, name: e.target.value })
-          }
-          required
-        />
-        <input
-          type="email"
-          className="form-control"
-          placeholder="Email"
-          value={newEmployee.email}
-          onChange={(e) =>
-            setNewEmployee({ ...newEmployee, email: e.target.value })
-          }
-          required
-        />
-        <button type="submit" className="btn btn-success">
-          Hozzáadás
-        </button>
+      {/* Új alkalmazott űrlap */}
+      <form onSubmit={handleAddEmployee} className="employee-form mt-3 mb-4">
+        <div className="row g-2">
+          <div className="col-md-4">
+            <input
+              type="text"
+              placeholder="Név"
+              value={newEmployee.name}
+              onChange={(e) =>
+                setNewEmployee({ ...newEmployee, name: e.target.value })
+              }
+              required
+            />
+          </div>
+
+          <div className="col-md-4">
+            <input
+              type="email"
+              placeholder="Email"
+              value={newEmployee.email}
+              onChange={(e) =>
+                setNewEmployee({ ...newEmployee, email: e.target.value })
+              }
+              required
+            />
+          </div>
+
+          <div className="col-md-4">
+            <button type="submit" className="btn-success">
+              Hozzáadás
+            </button>
+          </div>
+        </div>
       </form>
 
-      <table className="table table-striped align-middle">
+      {formError && <p className="form-error">{formError}</p>}
+
+      {/* Dolgozók táblázat */}
+      <table className="employee-table">
         <thead>
           <tr>
             <th>ID</th>
             <th>Név</th>
             <th>Email</th>
-            <th>Műveletek</th>
+            <th className="text-center">Műveletek</th>
           </tr>
         </thead>
         <tbody>
           {employees.map((e) => (
             <tr key={e.id}>
               <td>{e.id}</td>
-              <td>{e.name}</td>
-              <td>{e.email}</td>
-              <td>
-                <button
-                  className="btn btn-danger btn-sm"
-                  onClick={() => handleDelete(e.id)}
-                >
+              <td className="text-left">{e.name}</td>
+              <td className="text-left">{e.email}</td>
+              <td className="actions-centered">
+                <button className="btn-delete" onClick={() => handleDelete(e.id)}>
                   Törlés
                 </button>
               </td>

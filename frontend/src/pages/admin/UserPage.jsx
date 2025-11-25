@@ -1,24 +1,33 @@
+// src/pages/admin/UsersPage.jsx
 import { useEffect, useState } from "react";
-import "../../styles/services.css";
 import AdminHeader from "../../components/AdminHeader";
+
+import "../../styles/users.css";
+import "../../styles/global.css";
 
 export default function UsersPage() {
     const [users, setUsers] = useState([]);
     const [newUser, setNewUser] = useState({ name: "", email: "", role: "user" });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [formError, setFormError] = useState(null);
 
     const token = localStorage.getItem("token");
     const authHeader = token ? { Authorization: "Bearer " + token } : {};
 
     const fetchUsers = async () => {
+        setError(null);
         try {
             const res = await fetch("/api/users", { headers: { ...authHeader } });
-            if (!res.ok) throw new Error("Nem sikerült betölteni a felhasználókat.");
             const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || "Nem sikerült betölteni a felhasználókat.");
+            }
+
             setUsers(Array.isArray(data) ? data : []);
         } catch (err) {
-            setError("Nem sikerült betölteni a felhasználókat.");
+            setError(err.message);
         } finally {
             setLoading(false);
         }
@@ -26,23 +35,42 @@ export default function UsersPage() {
 
     useEffect(() => {
         fetchUsers();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleAddUser = async (e) => {
         e.preventDefault();
+        setFormError(null);
+
         try {
             const res = await fetch("/api/users", {
                 method: "POST",
-                headers: { "Content-Type": "application/json", ...authHeader },
-                body: JSON.stringify(newUser),
+                headers: {
+                    "Content-Type": "application/json",
+                    ...authHeader,
+                },
+                body: JSON.stringify({
+                    name: newUser.name,
+                    email: newUser.email,
+                    role: newUser.role,
+                    password: newUser.password,
+                }),
             });
-            if (!res.ok) throw new Error("Hozzáadás sikertelen");
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || "Hozzáadás sikertelen.");
+            }
+
             await fetchUsers();
-            setNewUser({ name: "", email: "", role: "user" });
+            setNewUser({ name: "", email: "", role: "user", password: "" });
+
         } catch (err) {
-            alert(err.message);
+            setFormError(err.message);
         }
     };
+
 
     const handleUpdateRole = async (id, role) => {
         try {
@@ -51,7 +79,13 @@ export default function UsersPage() {
                 headers: { "Content-Type": "application/json", ...authHeader },
                 body: JSON.stringify({ role }),
             });
-            if (!res.ok) throw new Error("Módosítás sikertelen");
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || "Módosítás sikertelen.");
+            }
+
             await fetchUsers();
         } catch (err) {
             alert(err.message);
@@ -60,72 +94,120 @@ export default function UsersPage() {
 
     const handleDelete = async (id) => {
         if (!window.confirm("Biztosan törlöd a felhasználót?")) return;
-        await fetch(`/api/users/${id}`, {
-            method: "DELETE",
-            headers: { ...authHeader },
-        });
-        fetchUsers();
+
+        try {
+            const res = await fetch(`/api/users/${id}`, {
+                method: "DELETE",
+                headers: { ...authHeader },
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || "Törlés sikertelen.");
+            }
+
+            await fetchUsers();
+        } catch (err) {
+            alert(err.message);
+        }
     };
 
     if (loading) return <p>Betöltés...</p>;
-    if (error) return <p>{error}</p>;
+
+    if (error) {
+        return (
+            <div className="admin-container container-lg">
+                <AdminHeader title="Felhasználók" />
+                <p className="text-danger text-center mt-3">{error}</p>
+            </div>
+        );
+    }
 
     return (
-        <div className="admin-container">
+        <div className="admin-container container-lg">
             <AdminHeader title="Felhasználók" />
-            <form onSubmit={handleAddUser} className="service-form mt-3 mb-4">
-                <input
-                    type="text"
-                    placeholder="Név"
-                    value={newUser.name}
-                    onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
-                    required
-                />
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={newUser.email}
-                    onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-                    required
-                />
-                <select
-                    value={newUser.role}
-                    onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
-                >
-                    <option value="user">User</option>
-                    <option value="admin">Admin</option>
-                </select>
-                <button type="submit">Hozzáadás</button>
+
+            {/* Új felhasználó űrlap */}
+            <form onSubmit={handleAddUser} className="users-form mt-3 mb-4">
+                <div className="row g-2">
+                    <div className="col-md-3">
+                        <input
+                            type="text"
+                            placeholder="Név"
+                            value={newUser.name}
+                            onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                            required
+                        />
+                    </div>
+
+                    <div className="col-md-3">
+                        <input
+                            type="email"
+                            placeholder="Email"
+                            value={newUser.email}
+                            onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                            required
+                        />
+                    </div>
+
+                    <div className="col-md-3">
+                        <input
+                            type="password"
+                            placeholder="Jelszó"
+                            value={newUser.password || ""}
+                            onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                            required
+                        />
+                    </div>
+
+                    <div className="col-md-2">
+                        <select
+                            value={newUser.role}
+                            onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
+                        >
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+
+                    <div className="col-md-1">
+                        <button type="submit" className="btn-success">OK</button>
+                    </div>
+                </div>
             </form>
 
-            <table className="table align-middle">
+
+            {formError && <p className="form-error">{formError}</p>}
+
+            {/* Táblázat */}
+            <table className="users-table">
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Név</th>
                         <th>Email</th>
                         <th>Szerep</th>
-                        <th>Műveletek</th>
+                        <th className="text-center">Műveletek</th>
                     </tr>
                 </thead>
                 <tbody>
                     {users.map((u) => (
                         <tr key={u.id}>
-                            <td>{u.id}</td>
-                            <td>{u.name}</td>
-                            <td>{u.email}</td>
-                            <td>
+                            <td className="text-left">{u.name}</td>
+                            <td className="text-left">{u.email}</td>
+                            <td className="text-center">
                                 <select
                                     value={u.role}
                                     onChange={(e) => handleUpdateRole(u.id, e.target.value)}
+                                    className="role-select"
                                 >
                                     <option value="user">User</option>
                                     <option value="admin">Admin</option>
                                 </select>
                             </td>
-                            <td>
+                            <td className="actions-centered">
                                 <button
-                                    className="btn btn-danger"
+                                    className="btn-delete"
                                     onClick={() => handleDelete(u.id)}
                                 >
                                     Törlés

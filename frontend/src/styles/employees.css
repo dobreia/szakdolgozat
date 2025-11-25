@@ -1,0 +1,99 @@
+/* Új alkalmazott form input */
+.employee-form input {
+    width: 100%;
+    border: 1px solid #aac4b3;
+    border-radius: 6px;
+    padding: 10px;
+    background: white;
+    font-size: 0.95rem;
+    transition: 0.25s;
+}
+
+.employee-form input:focus {
+    outline: none;
+    border-color: #00271B;
+    box-shadow: 0 0 0 3px rgba(0, 39, 27, 0.25);
+}
+
+/* Hozzáadás gomb */
+.btn-success {
+    background: #00271B;
+    color: white;
+    padding: 10px;
+    width: 100%;
+    border-radius: 6px;
+    transition: 0.25s;
+    border: none;
+}
+
+.btn-success:hover {
+    background: #014d32;
+    transform: translateY(-2px);
+}
+
+/* Táblázat */
+.employee-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    font-size: 0.95rem;
+}
+
+.employee-table th {
+    background: #00271B;
+    color: white;
+    font-weight: 600;
+    padding: 14px;
+    text-align: center;
+}
+
+.employee-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #e3e7e4;
+    text-align: center;
+}
+
+.employee-table td.text-left {
+    text-align: left;
+}
+
+.employee-table tr:hover {
+    background: #eef7f1;
+}
+
+/* Műveletek */
+.actions-centered {
+    text-align: center;
+}
+
+/* Törlés gomb */
+.btn-delete {
+    background: #d11a2a;
+    color: #fff;
+    border: none;
+    padding: 7px 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.btn-delete:hover {
+    background: #a80f20;
+    transform: scale(1.05);
+}
+
+/* Hibák */
+.form-error {
+    background: #ffe5e8;
+    color: #a10b20;
+    padding: 10px;
+    border-radius: 6px;
+    margin-top: -15px;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+    text-align: center;
+}
