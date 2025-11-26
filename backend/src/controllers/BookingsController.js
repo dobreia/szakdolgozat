@@ -1,5 +1,11 @@
 import pool from "../db.js";
 import { sendMail } from "../lib/mail.js";
+import {
+    bookingCreatedTemplate,
+    newBookingNotificationTemplate,
+    bookingRejectedTemplate,
+    bookingApprovedTemplate
+} from "../lib/mailTemplates.js";
 
 export default class BookingsController {
     static async getAll() {
@@ -76,9 +82,10 @@ export default class BookingsController {
 
             // 3️⃣ Szolgáltatás ellenőrzés
             const serviceRes = await pool.query(
-                "SELECT duration_minutes, active FROM services WHERE id = $1",
+                "SELECT name, duration_minutes, active FROM services WHERE id = $1",
                 [service_id]
             );
+
 
             if (!serviceRes.rowCount || !serviceRes.rows[0].active) {
                 const err = new Error("A szolgáltatás nem elérhető vagy inaktív!");
@@ -120,6 +127,7 @@ export default class BookingsController {
             const booking = insertRes.rows[0];
 
             // 6️⃣ Email küldés async
+            // 6️⃣ Email küldés async
             (async () => {
                 try {
                     const userRes = await pool.query(
@@ -128,22 +136,44 @@ export default class BookingsController {
                     );
                     const user = userRes.rows[0];
 
+                    const employeeRes = await pool.query(
+                        "SELECT name FROM employees WHERE id = $1",
+                        [employee_id]
+                    );
+                    const employee = employeeRes.rows[0];
+
+                    // 📌 Ügyfél email
                     await sendMail(
                         user.email,
-                        "Foglalás rögzítve",
-                        `<p>Kedves ${user.name}! A foglalásod rögzítettük.</p>`
+                        "Foglalás rögzítve ✔",
+                        bookingCreatedTemplate({
+                            name: user.name,
+                            serviceName: serviceRes.rows[0].name,
+                            employeeName: employee.name,
+                            start: start.toLocaleString("hu-HU"),
+                            end: end.toLocaleString("hu-HU"),
+                        })
                     );
 
+                    // 📌 Szalonnak email
                     await sendMail(
                         process.env.MAIL_USER,
-                        "Új foglalás érkezett",
-                        `<p>Új foglalás: ${user.name}</p>`
+                        "Új foglalás érkezett 📬",
+                        newBookingNotificationTemplate({
+                            userName: user.name,
+                            userEmail: user.email,
+                            serviceName: serviceRes.rows[0].name,
+                            employeeName: employee.name,
+                            start: start.toLocaleString("hu-HU"),
+                            end: end.toLocaleString("hu-HU")
+                        })
                     );
 
                 } catch (emailErr) {
                     console.error("📧 Email küldés hiba (nem kritikus):", emailErr);
                 }
             })();
+
 
             return booking;
 
@@ -169,9 +199,70 @@ export default class BookingsController {
         }
 
         const result = await pool.query(
-            `UPDATE bookings SET status = $1 WHERE id = $2 RETURNING *`,
+            `
+        UPDATE bookings
+        SET status = $1
+        WHERE id = $2
+        RETURNING *
+        `,
             [status, id]
         );
-        return result.rows[0];
+
+        if (!result.rowCount) {
+            throw new Error("Foglalás nem található");
+        }
+
+        const booking = result.rows[0];
+
+        // 🔍 Kapcsolt adatok lekérése
+        const details = await pool.query(`
+      SELECT 
+        u.name AS user_name, u.email,
+        s.name AS service_name,
+        e.name AS employee_name
+      FROM bookings b
+      JOIN users u ON b.user_id = u.id
+      JOIN services s ON b.service_id = s.id
+      JOIN employees e ON b.employee_id = e.id
+      WHERE b.id = $1
+    `, [id]);
+
+        const d = details.rows[0];
+        const start = new Date(booking.start_time).toLocaleString("hu-HU");
+        const end = new Date(booking.end_time).toLocaleString("hu-HU");
+
+        // 📧 Email küldés async módon
+        (async () => {
+            try {
+                if (status === "confirmed") {
+                    await sendMail(
+                        d.email,
+                        "Foglalás jóváhagyva ✔",
+                        bookingApprovedTemplate({
+                            name: d.user_name,
+                            serviceName: d.service_name,
+                            employeeName: d.employee_name,
+                            start,
+                            end
+                        })
+                    );
+                } else if (status === "cancelled") {
+                    await sendMail(
+                        d.email,
+                        "Foglalás elutasítva ❌",
+                        bookingRejectedTemplate({
+                            name: d.user_name,
+                            serviceName: d.service_name,
+                            employeeName: d.employee_name,
+                            start
+                        })
+                    );
+                }
+            } catch (err) {
+                console.error("Email küldés hiba (nem kritikus):", err.message);
+            }
+        })();
+
+        return booking;
     }
 }
