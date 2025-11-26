@@ -84,13 +84,15 @@ export default function Navbar({ user, setUser }) {
                             <li className="nav-item">
                                 <Link to="/services" className="nav-link">Szolgáltatások</Link>
                             </li>
-                            <li className="nav-item">
-                                <Link to="/booking" className="nav-link">Időpontfoglalás</Link>
-                            </li>
                             {user && (
-                                <li className="nav-item">
-                                    <Link to="/my-bookings" className="nav-link">Saját foglalásaim</Link>
-                                </li>
+                                <>
+                                    <li className="nav-item">
+                                        <Link to="/booking" className="nav-link">Időpontfoglalás</Link>
+                                    </li>
+                                    <li className="nav-item">
+                                        <Link to="/my-bookings" className="nav-link">Saját foglalásaim</Link>
+                                    </li>
+                                </>
                             )}
                         </ul>
                     </div>

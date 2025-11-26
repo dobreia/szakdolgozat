@@ -3,10 +3,13 @@ import pool from "../db.js";
 export default class ServicesController {
 
   // Szolgáltatások listázása (GET)
-  static async getAll() {
-    const result = await pool.query("SELECT * FROM services ORDER BY id");
+  static async getAllPublic() {
+    const result = await pool.query(
+      "SELECT id, name, duration_minutes, price_cents FROM services WHERE active = true ORDER BY id"
+    );
     return result.rows;
   }
+
 
   // Új szolgáltatás létrehozása (POST)
   static async create({ name, duration_minutes, price_cents, active }) {

@@ -58,7 +58,7 @@ export default function ServicesPage() {
                             </p>
 
                             <p className="service-price mb-3">
-                                {(s.price_cents / 100).toLocaleString()} Ft
+                                {(s.price_cents).toLocaleString()} Ft
                             </p>
 
                             <button

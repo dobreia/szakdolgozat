@@ -5,9 +5,15 @@ const router = express.Router();
 
 // GET - szolgáltatások listája
 router.get("/", async (req, res) => {
-    const data = await ServicesController.getAll();
-    res.json(data);
+    try {
+        const services = await ServicesController.getAllPublic();
+        res.json(services);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Hiba történt a szolgáltatások lekérésekor." });
+    }
 });
+
 
 // POST - új szolgáltatás
 router.post("/", async (req, res) => {
