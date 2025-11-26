@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import AdminHeader from "../../components/AdminHeader";
-
 import "../../styles/employees.css";
 
 export default function EmployeesPage() {
@@ -11,7 +10,7 @@ export default function EmployeesPage() {
 
   const [newEmployee, setNewEmployee] = useState({
     name: "",
-    email: ""
+    email: "",
   });
 
   const token = localStorage.getItem("token");
@@ -26,7 +25,7 @@ export default function EmployeesPage() {
 
       const data = await res.json();
       setEmployees(data);
-    } catch (err) {
+    } catch {
       setError("Hiba történt a dolgozók betöltése során.");
     } finally {
       setLoading(false);
@@ -54,7 +53,7 @@ export default function EmployeesPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setFormError(data.message || "Hozzáadás sikertelen");
+        setFormError(data.error || "Hozzáadás sikertelen");
         return;
       }
 
@@ -88,9 +87,9 @@ export default function EmployeesPage() {
   return (
     <div className="admin-container container-lg">
       <AdminHeader title="Dolgozók" />
-
+      {formError && <p className="form-error">{formError}</p>}
       {/* Új alkalmazott űrlap */}
-      <form onSubmit={handleAddEmployee} className="employee-form mt-3 mb-4">
+      <form onSubmit={handleAddEmployee} className="employee-form mt-3 mb-4" noValidate>
         <div className="row g-2">
           <div className="col-md-4">
             <input
@@ -100,7 +99,7 @@ export default function EmployeesPage() {
               onChange={(e) =>
                 setNewEmployee({ ...newEmployee, name: e.target.value })
               }
-              required
+              className={formError ? "input-error" : ""}
             />
           </div>
 
@@ -112,7 +111,7 @@ export default function EmployeesPage() {
               onChange={(e) =>
                 setNewEmployee({ ...newEmployee, email: e.target.value })
               }
-              required
+              className={formError ? "input-error" : ""}
             />
           </div>
 
@@ -124,7 +123,6 @@ export default function EmployeesPage() {
         </div>
       </form>
 
-      {formError && <p className="form-error">{formError}</p>}
 
       {/* Dolgozók táblázat */}
       <table className="employee-table">
@@ -143,7 +141,10 @@ export default function EmployeesPage() {
               <td className="text-left">{e.name}</td>
               <td className="text-left">{e.email}</td>
               <td className="actions-centered">
-                <button className="btn-delete" onClick={() => handleDelete(e.id)}>
+                <button
+                  className="btn-delete"
+                  onClick={() => handleDelete(e.id)}
+                >
                   Törlés
                 </button>
               </td>
