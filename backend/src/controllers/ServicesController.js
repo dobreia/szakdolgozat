@@ -9,6 +9,14 @@ export default class ServicesController {
     );
     return result.rows;
   }
+  
+  // Adminnak minden kell (active mezővel)
+  static async getAllAdmin() {
+    const result = await pool.query(
+      "SELECT id, name, duration_minutes, price_cents, active FROM services ORDER BY id"
+    );
+    return result.rows;
+  }
 
 
   // Új szolgáltatás létrehozása (POST)

@@ -34,32 +34,52 @@ export default class BookingsController {
         });
 
         try {
-            // 1️⃣ Szolgáltatás lekérdezése
+            // 1️⃣ Kötelező mezők ellenőrzése
+            if (!user_id || !service_id || !employee_id || !start_time) {
+                const err = new Error("Minden mező kitöltése kötelező!");
+                err.status = 400;
+                throw err;
+            }
+
+            // 2️⃣ Dátum validáció
+            const start = new Date(`${start_time}:00`); // helyes lokális értelmezés
+            if (isNaN(start.getTime())) {
+                const err = new Error("Érvénytelen dátum!");
+                err.status = 400;
+                throw err;
+            }
+
+            if (start < new Date()) {
+                const err = new Error("Múltbeli időpontra nem lehet foglalni!");
+                err.status = 400;
+                throw err;
+            }
+
+            // 3️⃣ Szolgáltatás lekérdezése
             const serviceRes = await pool.query(
-                "SELECT name, duration_minutes FROM services WHERE id = $1",
+                "SELECT name, duration_minutes, active FROM services WHERE id = $1",
                 [service_id]
             );
 
-            if (serviceRes.rowCount === 0) {
-                const err = new Error("Nincs ilyen szolgáltatás");
+            if (serviceRes.rowCount === 0 || !serviceRes.rows[0].active) {
+                const err = new Error("A szolgáltatás nem elérhető!");
                 err.status = 400;
                 throw err;
             }
 
             const { name: service_name, duration_minutes: duration } = serviceRes.rows[0];
 
-            // 2️⃣ Időpontok helyes kezelése — nincs timezone konverzió!
-            const start = new Date(`${start_time}:00`); // 🔥 lokális értelmezés
+            // 4️⃣ Időtartam számítása
             const end = new Date(start.getTime() + duration * 60000);
 
-            console.log("🕒 Számított időpontok:", { start, end });
-
-            // 3️⃣ Ütközés ellenőrzése
+            // 5️⃣ Ütközés ellenőrzés (pending + confirmed)
             const conflict = await pool.query(
-                `SELECT 1 FROM bookings
+                `
+            SELECT 1 FROM bookings
             WHERE employee_id = $1
             AND status IN ('pending', 'confirmed')
-            AND NOT ($3 <= start_time OR $2 >= end_time)`,
+            AND NOT ($3 <= start_time OR $2 >= end_time)
+            `,
                 [employee_id, start, end]
             );
 
@@ -69,54 +89,60 @@ export default class BookingsController {
                 throw err;
             }
 
-            // 4️⃣ Beszúrás
+            // 6️⃣ Beszúrás az adatbázisba
             const insertRes = await pool.query(
-                `INSERT INTO bookings
+                `
+            INSERT INTO bookings
             (user_id, service_id, employee_id, start_time, end_time, status)
             VALUES ($1, $2, $3, $4, $5, 'pending')
-            RETURNING *`,
+            RETURNING *
+            `,
                 [user_id, service_id, employee_id, start, end]
             );
 
             const booking = insertRes.rows[0];
             console.log("✅ Foglalás létrehozva ID:", booking.id);
 
-            // 5️⃣ Email küldés (ha nem fontos, kommentelhető)
-            try {
-                const userRes = await pool.query(
-                    "SELECT name, email FROM users WHERE id = $1",
-                    [user_id]
-                );
-                const employeeRes = await pool.query(
-                    "SELECT name FROM employees WHERE id = $1",
-                    [employee_id]
-                );
+            // 7️⃣ Opcionális email értesítések
+            (async () => {
+                try {
+                    const userRes = await pool.query(
+                        "SELECT name, email FROM users WHERE id = $1",
+                        [user_id]
+                    );
+                    const employeeRes = await pool.query(
+                        "SELECT name FROM employees WHERE id = $1",
+                        [employee_id]
+                    );
 
-                const user = userRes.rows[0];
-                const employee = employeeRes.rows[0];
+                    const user = userRes.rows[0];
 
-                await sendMail(
-                    user.email,
-                    "Foglalás rögzítve",
-                    `<p>Kedves ${user.name}! A foglalásod rögzítettük.</p>`
-                );
-                await sendMail(
-                    process.env.MAIL_USER,
-                    "Új foglalás érkezett",
-                    `<p>Új foglalás ${user.name} által.</p>`
-                );
-            } catch (emailErr) {
-                console.error("📧 Email küldés hiba:", emailErr);
-            }
+                    await sendMail(
+                        user.email,
+                        "Foglalás rögzítve",
+                        `<p>Kedves ${user.name}! A foglalásod rögzítettük.</p>`
+                    );
+
+                    await sendMail(
+                        process.env.MAIL_USER,
+                        "Új foglalás érkezett",
+                        `<p>Új foglalás: ${user.name}</p>`
+                    );
+
+                } catch (emailErr) {
+                    console.error("📧 Email küldés hiba (nem kritikus):", emailErr);
+                }
+            })();
 
             return booking;
 
         } catch (err) {
-            console.error("💥 Foglalás létrehozása sikertelen:", err);
+            console.error("Foglalás létrehozása sikertelen:", err);
             if (!err.status) err.status = 500;
             throw err;
         }
     }
+
 
 
     static async delete(id) {

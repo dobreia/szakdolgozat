@@ -49,7 +49,7 @@ export default function BookingPage() {
         user_id: user.id,
         service_id: form.service_id,
         employee_id: form.employee_id,
-        date: form.date,
+        start_time: form.date
       });
 
       setMessage("A foglalás sikeresen leadva!");

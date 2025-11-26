@@ -6,13 +6,22 @@ const router = express.Router();
 // GET - szolgáltatások listája
 router.get("/", async (req, res) => {
     try {
-        const services = await ServicesController.getAllPublic();
+        const services = await ServicesController.getAllAdmin();
         res.json(services);
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Hiba történt a szolgáltatások lekérésekor." });
     }
 });
+router.get("/public", async (req, res) => {
+    try {
+        const services = await ServicesController.getAllPublic();
+        res.json(services);
+    } catch (err) {
+        res.status(500).json({ error: "Hiba történt a szolgáltatások lekérésekor." });
+    }
+});
+
 
 
 // POST - új szolgáltatás

@@ -15,7 +15,7 @@ export default function ServicesPage() {
 
     const fetchServices = async () => {
         try {
-            const res = await fetch("/api/services");
+            const res = await fetch("/api/services?public=true");
             if (!res.ok) throw new Error("Nem sikerült betölteni a szolgáltatásokat.");
             setServices(await res.json());
         } catch (err) {
@@ -48,7 +48,7 @@ export default function ServicesPage() {
             <h2 className="text-center mb-4">Szolgáltatásaink</h2>
 
             <div className="row g-4 justify-content-center">
-                {services.map((s) => (
+                {services.filter(s => s.active !== false).map((s) => (
                     <div key={s.id} className="col-md-4 col-sm-6">
                         <div className="service-card shadow-sm text-center">
                             <h5 className="card-title mb-2">{s.name}</h5>
