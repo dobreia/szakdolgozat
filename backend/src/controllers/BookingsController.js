@@ -58,7 +58,7 @@ export default class BookingsController {
             const conflict = await pool.query(
                 `SELECT 1 FROM bookings
             WHERE employee_id = $1
-            AND status != 'cancelled'
+            AND status IN ('pending', 'confirmed')
             AND NOT ($3 <= start_time OR $2 >= end_time)`,
                 [employee_id, start, end]
             );

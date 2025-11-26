@@ -5,8 +5,6 @@ import "../styles/navbar.css";
 export default function Navbar({ user, setUser }) {
     const navigate = useNavigate();
     const location = useLocation();
-
-    // Ha a főoldalon vagyunk → legyen átlátszó navbar
     const isHome = location.pathname === "/";
 
     const handleLogout = () => {
@@ -17,47 +15,26 @@ export default function Navbar({ user, setUser }) {
 
     return (
         <nav className={`navbar navbar-expand-lg ${isHome ? "navbar-transparent" : ""}`}>
-            <div className="container-lg d-flex justify-content-between align-items-center">
+            <div className="container-lg d-flex align-items-center">
 
                 {/* Brand */}
-                <Link className="navbar-brand fw-semibold" to="/">
+                <Link className="navbar-brand fw-semibold me-auto" to="/">
                     Varázs Szépségszalon
                 </Link>
 
-                {/* Menü linkek — csak normál usernek */}
-                {(!user || user.role === "user") && (
-                    <div className="collapse navbar-collapse" id="mainNavbar">
-                        <ul className="navbar-nav ms-3 mb-2 mb-lg-0">
-                            <li className="nav-item">
-                                <Link to="/" className="nav-link">Főoldal</Link>
-                            </li>
-                            <li className="nav-item">
-                                <Link to="/services" className="nav-link">Szolgáltatások</Link>
-                            </li>
-                            <li className="nav-item">
-                                <Link to="/booking" className="nav-link">Időpontfoglalás</Link>
-                            </li>
-                            {user && (
-                                <li className="nav-item">
-                                    <Link to="/my-bookings" className="nav-link">Saját foglalásaim</Link>
-                                </li>
-                            )}
-                        </ul>
-                    </div>
-                )}
+                {/* Profil + hamburger — mindig jobb felső sarokban */}
+                <div className="d-flex align-items-center gap-2 order-lg-2">
 
-                {/* Jobb oldal: profil + hamburger */}
-                <div className="d-flex align-items-center gap-2">
-                    <div className="dropdown me-2">
+                    {/* Profil ikon dropdown */}
+                    <div className="dropdown">
                         <button
-                            className="btn profile-btn dropdown-toggle d-flex align-items-center"
+                            className="btn profile-btn dropdown-toggle"
                             type="button"
                             data-bs-toggle="dropdown"
                             aria-expanded="false"
                         >
                             <img src={profileIcon} alt="Profil" className="profile-icon" />
                         </button>
-
 
                         <ul className="dropdown-menu dropdown-menu-end">
                             {!user ? (
@@ -84,6 +61,7 @@ export default function Navbar({ user, setUser }) {
                         </ul>
                     </div>
 
+                    {/* Hamburger csak annál, akinek van menüje */}
                     {(!user || user.role === "user") && (
                         <button
                             className="navbar-toggler"
@@ -95,6 +73,29 @@ export default function Navbar({ user, setUser }) {
                         </button>
                     )}
                 </div>
+
+                {/* Menü linkek — külön collapsel */}
+                {(!user || user.role === "user") && (
+                    <div className="collapse navbar-collapse order-lg-1" id="mainNavbar">
+                        <ul className="navbar-nav ms-lg-3 mb-2 mb-lg-0">
+                            <li className="nav-item">
+                                <Link to="/" className="nav-link">Főoldal</Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link to="/services" className="nav-link">Szolgáltatások</Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link to="/booking" className="nav-link">Időpontfoglalás</Link>
+                            </li>
+                            {user && (
+                                <li className="nav-item">
+                                    <Link to="/my-bookings" className="nav-link">Saját foglalásaim</Link>
+                                </li>
+                            )}
+                        </ul>
+                    </div>
+                )}
+
             </div>
         </nav>
     );

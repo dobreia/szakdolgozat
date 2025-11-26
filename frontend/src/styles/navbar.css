@@ -5,24 +5,28 @@
     box-shadow: 0px 6px 30px 0px #6cb58f !important;
     padding: 10px 0;
     z-index: 100;
+    animation: fadeIn 0.3s ease-out;
 }
 
+/* Brand */
 .navbar-brand {
     font-size: 1.25rem;
     font-weight: 700;
     color: #16422B !important;
 }
 
+/* Menü linkek */
 .nav-link {
     color: #16422B !important;
     font-weight: 500;
     padding: 8px 12px;
-    transition: 0.25s ease-in-out;
+    transition: color 0.25s ease-in-out, transform 0.25s ease-in-out;
 }
 
 .nav-link:hover {
     color: #0b281a !important;
     text-decoration: none;
+    transform: translateY(-1px);
 }
 
 /* Profil ikon gomb — teljesen átlátszó */
@@ -36,18 +40,17 @@
     padding: 0 !important;
 }
 
-/* PROBLÉMA MEGOLDÁS: Bootstrap szűrők eltávolítása, fehér ikon */
+/* Profil ikon alapértelmezetten: fekete (az svg ilyen) */
 .profile-icon,
 .navbar .btn.profile-btn img {
     width: 32px;
     height: 32px;
-    filter: invert(1) brightness(100) !important;
     transition: transform 0.25s ease, filter 0.25s ease;
 }
 
+/* Hover animáció — szín nélkül, csak méret */
 .profile-icon:hover {
     transform: scale(1.12);
-    filter: invert(1) brightness(150) !important;
 }
 
 /* Dropdown toggle nyíl elrejtése */
@@ -55,37 +58,64 @@
     display: none !important;
 }
 
-/* Hamburger ikon is legyen világos */
+/* Hamburger ikon alapbeállítás: fekete, keret nélkül */
 .navbar-toggler {
-    filter: invert(1) brightness(100) !important;
     border: none !important;
+    box-shadow: none !important;
+    padding: 4px 8px;
+    transition: transform 0.2s ease, filter 0.25s ease;
 }
 
+.navbar-toggler:focus {
+    box-shadow: none !important;
+}
 
-/* 🧙‍♂️ Külön stílus a főoldalon */
+.navbar-toggler:hover {
+    transform: scale(1.05);
+}
+
+/* 🧙‍♂️ Külön stílus a főoldalon (átlátszó navbar, világos elemek) */
 .navbar.navbar-transparent {
     background: transparent !important;
     box-shadow: none !important;
     position: absolute;
     width: 100%;
     top: 0;
+    left: 0;
 }
 
+/* Főoldali szövegek világosra állítva */
 .navbar.navbar-transparent .navbar-brand,
 .navbar.navbar-transparent .nav-link {
     color: #e8f6ec !important;
     text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
-.navbar.navbar-transparent .profile-icon {
-    filter: invert(1) brightness(180) !important;
-}
-
 .navbar.navbar-transparent .nav-link:hover {
     color: #ffffff !important;
 }
 
-/* 🌙 Fade animáció */
+/* Főoldalon: profil ikon legyen fehér */
+.navbar.navbar-transparent .profile-icon,
+.navbar.navbar-transparent .btn.profile-btn img {
+    filter: invert(1) brightness(200) !important;
+}
+
+.navbar.navbar-transparent .profile-icon:hover {
+    filter: invert(1) brightness(250) !important;
+    transform: scale(1.12);
+}
+
+/* Főoldalon: hamburger ikon is legyen világos */
+.navbar.navbar-transparent .navbar-toggler {
+    filter: invert(1) brightness(200) !important;
+}
+
+.navbar.navbar-transparent .navbar-toggler:hover {
+    filter: invert(1) brightness(250) !important;
+}
+
+/* 🌙 Fade animáció felülről */
 @keyframes fadeIn {
     from {
         opacity: 0;
