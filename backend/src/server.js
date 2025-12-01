@@ -7,7 +7,7 @@ import bookingsRoutes from "./routes/bookingsRoutes.js";
 import employeesRoutes from "./routes/employeesRoutes.js";
 import servicesRoutes from "./routes/servicesRoutes.js";
 import usersRoutes from "./routes/usersRoutes.js";
-import { authRequired, adminOnly } from "./middleware/authMiddleware.js";
+import { authRequired, adminRequired } from "./middleware/authMiddleware.js";
 
 dotenv.config();
 const app = express();
@@ -24,8 +24,8 @@ app.use("/api/employees", employeesRoutes);
 
 // 🔐 Csak bejelentkezett vagy admin felhasználóknak
 app.use("/api/bookings", authRequired, bookingsRoutes);
-app.use("/api/users", authRequired, adminOnly, usersRoutes);
-app.use("/api/admin", authRequired, adminOnly, (req, res) => {
+app.use("/api/users", authRequired, adminRequired, usersRoutes);
+app.use("/api/admin", authRequired, adminRequired, (req, res) => {
     res.json({ message: "Admin hozzáférés engedélyezve!" });
 });
 

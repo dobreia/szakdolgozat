@@ -1,0 +1,96 @@
+/* Hero háttér */
+.hero {
+    position: relative;
+    height: 100vh;
+    background: url("../assets/images/bg-leaves.jpeg") center/cover no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Sötét overlay olvashatóságért */
+.hero .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 25, 18, 0.65);
+}
+
+/* Szöveg doboz */
+.content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    animation: fadeIn 1s ease-in-out;
+    font-family: Montserrat, sans-serif
+}
+
+/* Címsorok */
+.title {
+    font-size: 3.8rem;
+    color: #eef7f1 !important;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.subtitle {
+    font-size: 1.5rem;
+    color: #d3e4db !important;
+    margin-top: 18px;
+    font-weight: 500;
+}
+
+/* Elválasztó */
+.separator {
+    width: 120px;
+    height: 3px;
+    background: white;
+    margin: 18px auto;
+    border-radius: 2px;
+}
+
+/* CTA gomb */
+.btn-cta {
+    display: inline-block;
+    margin-top: 32px;
+    padding: 14px 32px;
+    background: #1db954;
+    color: #00271B;
+    font-weight: 700;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 1.1rem;
+    transition: 0.25s;
+}
+
+.btn-cta:hover {
+    background: #27c863;
+    transform: translateY(-3px);
+}
+
+/* Animáció */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Mobil reszponzivitás */
+@media (max-width: 768px) {
+    .title {
+        font-size: 2.4rem;
+    }
+
+    .subtitle {
+        font-size: 1.1rem;
+    }
+}

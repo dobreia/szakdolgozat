@@ -1,6 +1,6 @@
 import express from "express";
 import UsersController from "../controllers/UsersController.js";
-import { authRequired, adminOnly } from "../middleware/authMiddleware.js";
+import { authRequired, adminRequired } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -8,7 +8,7 @@ const router = express.Router();
 router.use(authRequired);
 
 // Csak admin hozzáférés a többi végponthoz
-router.use(adminOnly);
+router.use(adminRequired);
 
 // GET - Összes felhasználó lekérése
 router.get("/", async (req, res) => {

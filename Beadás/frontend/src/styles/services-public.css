@@ -1,0 +1,54 @@
+/* --- Szolgáltatás kártyák --- */
+h2{
+    font-weight: 900 !important;
+    font-size: 40px !important;
+}
+
+.service-card {
+    background: #ffffff;
+    border: none;
+    border-radius: 18px;
+    padding: 22px;
+    transition: 0.25s ease;
+    cursor: pointer;
+    min-height: 180px;
+}
+
+.service-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Ár szép kiemelése */
+.service-price {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #00271B;
+}
+
+/* Foglalás gomb - egységes az ügyfél oldalakkal */
+.btn-book {
+    background: #00271B;
+    color: #ffffff;
+    border-radius: 8px;
+    border: none;
+    padding: 9px 14px;
+    font-weight: 600;
+    transition: 0.25s;
+}
+
+.btn-book:hover {
+    background: #024c2f;
+    transform: translateY(-2px);
+}
+
+.card-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #00271B;
+}
+
+/* Reszponzív igazítás */
+.service-description {
+    color: #444;
+}

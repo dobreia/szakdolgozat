@@ -1,0 +1,214 @@
+/* Általános admin konténer */
+.admin-container {
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* --- Új foglalás űrlap --- */
+.booking-form input,
+.booking-form select {
+    width: 100%;
+    border: 1px solid #aac4b3;
+    border-radius: 6px;
+    padding: 10px;
+    background: white;
+    font-size: 0.95rem;
+    transition: 0.25s;
+}
+
+.booking-form input:focus,
+.booking-form select:focus {
+    outline: none;
+    border-color: #00271B;
+    box-shadow: 0 0 0 3px rgba(0, 39, 27, 0.25);
+}
+
+.btn-success {
+    background: #00271B;
+    color: white;
+    padding: 10px;
+    width: 100%;
+    border-radius: 6px;
+    transition: 0.25s;
+    border: none;
+}
+
+.btn-success:hover {
+    background: #014d32;
+    transform: translateY(-2px);
+}
+
+/* ---- Reszponzív táblázat ---- */
+.booking-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-top: 12px;
+}
+
+/* ---- Táblázat ---- */
+.booking-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    font-size: 0.95rem;
+    table-layout: fixed;
+    min-width: 900px;
+    /* mobil kompatibilitás */
+}
+
+.booking-table th {
+    background: #00271B;
+    color: white;
+    font-weight: 600;
+    padding: 14px;
+    text-align: center;
+}
+
+.booking-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #e3e7e4;
+    vertical-align: middle;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.booking-table td:nth-child(1),
+.booking-table td:nth-child(2),
+.booking-table td:nth-child(3) {
+    text-align: left;
+}
+
+.booking-table tr:hover {
+    background: #eef7f1;
+}
+
+/* ---- Státusz ---- */
+.status-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: none !important;
+}
+
+/* Levágás megszüntetése hogy ne legyen csík */
+.booking-table td.status-cell {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+}
+
+.status-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+}
+
+.status-dot.confirmed {
+    background-color: #1db954;
+}
+
+.status-dot.pending {
+    background-color: #f4c542;
+}
+
+.status-dot.cancelled {
+    background-color: #c62525;
+}
+
+/* Gombok */
+.btn-edit,
+.btn-delete {
+    border: none;
+    padding: 7px 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.25s;
+    white-space: nowrap;
+}
+
+.btn-edit {
+    background: #e6be00;
+    color: #2f2400;
+}
+
+.btn-edit:hover {
+    background: #cfa600;
+}
+
+.btn-delete {
+    background: #d11a2a;
+    color: #fff;
+}
+
+.btn-delete:hover {
+    background: #a80f20;
+    transform: scale(1.05);
+}
+
+/* ---- Mobilbarát táblázat overlay ---- */
+@media (max-width: 768px) {
+    .booking-table-wrapper {
+        overflow-x: hidden;
+        /* már nincs szükség scrollra */
+    }
+
+    .booking-table,
+    .booking-table thead,
+    .booking-table tbody,
+    .booking-table th,
+    .booking-table td,
+    .booking-table tr {
+        display: block;
+        width: 100%;
+    }
+
+    .booking-table thead {
+        display: none;
+        /* fejléc eltűnik mobilon */
+    }
+
+    .booking-table tr {
+        background: #fff;
+        margin-bottom: 14px;
+        border-radius: 10px;
+        padding: 12px;
+        border: 1px solid #ccd6d2;
+    }
+
+    .booking-table td {
+        text-align: left;
+        border: none;
+        padding: 8px 0;
+        position: relative;
+        font-size: 0.9rem;
+    }
+
+    /* Fejléc mezők kiírása mobilon */
+    .booking-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #00271B;
+        display: block;
+        margin-bottom: 3px;
+    }
+
+    /* Gombok egymás alá */
+    .action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-top: 10px;
+    }
+
+    .status-cell {
+        justify-content: flex-start;
+    }
+}

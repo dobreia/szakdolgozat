@@ -1,7 +1,7 @@
 import express from "express";
 import pool from "../db.js";
 import BookingsController from "../controllers/BookingsController.js";
-import { authRequired, adminOnly } from "../middleware/authMiddleware.js";
+import { authRequired, adminRequired } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -109,7 +109,7 @@ router.delete("/:id", authRequired, async (req, res) => {
 });
 
 //Foglalás státuszának módosítása (admin only)
-router.put("/:id/status", authRequired, adminOnly, async (req, res) => {
+router.put("/:id/status", authRequired, adminRequired, async (req, res) => {
   try {
     const { status } = req.body;
     // Státusz frissítése

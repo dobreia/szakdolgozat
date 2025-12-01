@@ -1,0 +1,107 @@
+/* --- Oldal konténer --- */
+
+
+.my-bookings-container {
+    max-width: 1050px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Cím */
+.my-bookings-title {
+    font-size: 40px;
+    font-weight: 900;
+    text-align: center;
+    margin: 25px 0;
+    color: #00271B;
+}
+
+/* --- Táblázat stílus --- */
+.my-bookings-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #ffffff;
+    font-size: 0.95rem;
+}
+
+.my-bookings-table th {
+    background: #00271B;
+    color: #fff;
+    text-align: center;
+    padding: 14px;
+    font-weight: 600;
+}
+
+.my-bookings-table td {
+    text-align: center;
+    padding: 12px 10px;
+    border-bottom: 1px solid #e3e7e4;
+}
+
+/* Táblázat hover */
+.my-bookings-table tr:hover {
+    background: #eef7f1;
+}
+
+/* Szolgáltatás és dolgozó balra igazítva */
+.my-bookings-table td:nth-child(2),
+.my-bookings-table td:nth-child(3) {
+    text-align: left;
+    white-space: nowrap;
+}
+
+/* státusz badge harmonizálás */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+
+/* pötty a státusz előtt */
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+/* különböző státuszszínek */
+.status-confirmed {
+    background-color: #d9f7e8;
+    color: #0b5930;
+}
+
+.status-confirmed .status-dot {
+    background-color: #1db954;
+}
+
+.status-pending {
+    background-color: #fff7d1;
+    color: #725a00;
+}
+
+.status-pending .status-dot {
+    background-color: #f4c542;
+}
+
+.status-cancelled {
+    background-color: #ffe3e6;
+    color: #8a0012;
+}
+
+.status-cancelled .status-dot {
+    background-color: #c62525;
+}
+
+/* Üres lista */
+.no-bookings {
+    text-align: center;
+    color: #4f5e59;
+    font-size: 1.1rem;
+    margin-top: 20px;
+}

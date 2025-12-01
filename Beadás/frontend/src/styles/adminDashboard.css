@@ -1,0 +1,53 @@
+h1{
+    color: #16422B !important;
+    font-weight: 700 !important;
+}
+
+h2{
+    color: #16422bba !important;
+    font-weight: 500 !important;
+}
+
+.admin-dashboard {
+    min-height: 80vh;
+    padding-bottom: 40px;
+    font-family: 'Nunito', sans-serif;
+    color: #16422B;
+}
+
+.admin-card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    text-decoration: none;
+    border: 2px solid #e4f4e9;
+    color: #16422B;
+    cursor: pointer;
+    transition: 0.25s ease;
+    box-shadow: 0 4px 18px rgba(108, 181, 143, 0.15);
+    display: block;
+}
+
+.admin-card:hover {
+    transform: translateY(-6px);
+    background-color: #ffffff;
+    box-shadow: 0 6px 28px rgba(108, 181, 143, 0.3);
+}
+
+.admin-card h4 {
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 1.3rem;
+}
+
+.admin-card p {
+    font-size: 0.95rem;
+    margin: 0;
+    color: #4f705f;
+}
+
+/* Reszponzív távolságok */
+@media (max-width: 768px) {
+    .admin-card {
+        padding: 24px 10px !important;
+    }
+}

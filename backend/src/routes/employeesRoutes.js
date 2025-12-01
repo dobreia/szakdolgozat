@@ -1,6 +1,6 @@
 import express from "express";
 import EmployeesController from "../controllers/EmployeesController.js";
-import { authRequired, adminOnly } from "../middleware/authMiddleware.js";
+import { authRequired, adminRequired } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -18,7 +18,7 @@ router.get("/", authRequired, async (req, res) => {
 });
 
 // Új alkalmazott felvétele (admin jogosultság szükséges)
-router.post("/", authRequired, adminOnly, async (req, res) => {
+router.post("/", authRequired, adminRequired, async (req, res) => {
     try {
         const employee = await EmployeesController.create(req.body);
         res.status(201).json(employee);
@@ -29,7 +29,7 @@ router.post("/", authRequired, adminOnly, async (req, res) => {
 });
 
 // Alkalmazott módosítása (admin jogosultság szükséges)
-router.put("/:id", authRequired, adminOnly, async (req, res) => {
+router.put("/:id", authRequired, adminRequired, async (req, res) => {
     try {
         const employee = await EmployeesController.update(req.params.id, req.body);
         res.json(employee);
@@ -40,7 +40,7 @@ router.put("/:id", authRequired, adminOnly, async (req, res) => {
 });
 
 // Alkalmazott törlése (admin jogosultság szükséges)
-router.delete("/:id", authRequired, adminOnly, async (req, res) => {
+router.delete("/:id", authRequired, adminRequired, async (req, res) => {
     try {
         const response = await EmployeesController.delete(req.params.id);
         res.json(response);

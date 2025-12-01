@@ -1,0 +1,98 @@
+/* Form elements */
+.users-form input,
+.users-form select {
+    width: 100%;
+    border: 1px solid #aac4b3;
+    border-radius: 6px;
+    padding: 10px;
+    background: white;
+    font-size: 0.95rem;
+    transition: 0.25s;
+}
+
+.users-form input:focus,
+.users-form select:focus {
+    outline: none;
+    border-color: #00271B;
+    box-shadow: 0 0 0 3px rgba(0, 39, 27, 0.25);
+}
+
+/* Button */
+.btn-success {
+    background: #00271B;
+    color: white;
+    width: 100%;
+    border-radius: 6px;
+    transition: 0.25s;
+    border: none;
+    font-weight: 600;
+}
+
+.btn-success:hover {
+    background: #014d32;
+    transform: translateY(-2px);
+}
+
+/* Table styling */
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    font-size: 0.95rem;
+}
+
+.users-table th {
+    background: #00271B;
+    color: white;
+    font-weight: 600;
+    padding: 14px;
+    text-align: center;
+}
+
+.users-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #e3e7e4;
+    text-align: center;
+}
+
+.users-table td.text-left {
+    text-align: left;
+}
+.users-table td:nth-child(1), .users-table td:nth-child(2) {
+    width: 200px;
+}
+
+.users-table tr:hover {
+    background: #eef7f1;
+}
+
+.actions-centered {
+    text-align: center;
+}
+
+/* Role dropdown */
+.role-select {
+    padding: 6px;
+    border-radius: 6px;
+    border: 1px solid #aac4b3;
+}
+
+/* Delete button */
+.btn-delete {
+    background: #d11a2a;
+    color: #fff;
+    border: none;
+    padding: 7px 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.btn-delete:hover {
+    background: #a80f20;
+    transform: scale(1.05);
+}

@@ -1,0 +1,36 @@
+.admin-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* középre teszi a címet */
+    position: relative;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    border-bottom: 3px solid rgba(0, 39, 27, 0.2);
+    padding: 20px 0;
+}
+
+/* vissza gomb bal oldalon, fixen pozicionálva */
+.admin-header button {
+    position: absolute;
+    left: 0;
+    background-color: #00271C;
+    border: none;
+    padding: 6px 14px;
+    font-size: 14px;
+    border-radius: 6px;
+    transition: 0.2s;
+    color: white;
+}
+
+.admin-header button:hover {
+    background-color: #14674a;
+}
+
+.admin-header h2 {
+    margin: 0;
+    font-weight: 600;
+    font-family: "Varela Round", sans-serif;
+    color: var(--primary) !important;
+    opacity: 1;
+}
